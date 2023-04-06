@@ -1,9 +1,5 @@
 ## <span>React with close friend =  Vite + Axios + Router Dom</span>
 
-<h3> npm create vite@latest react-app -- --template react </h3>
-<h3>cd your-project</h3>
-<h3>npm install </h3>
-
 <h3>npm run dev (il) </h3>
 
 ## Requirement 1
