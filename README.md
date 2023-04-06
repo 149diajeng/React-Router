@@ -1,25 +1,25 @@
 ## <span>React with close friend =  Vite + Axios + Router Dom</span>
 
-npm create vite@latest react-app -- --template react
-cd your-project
-npm install
+<h3> npm create vite@latest react-app -- --template react </h3>
+<h3>cd your-project</h3>
+<h3>npm install </h3>
 
-npm run dev (il)
+<h3>npm run dev (il) </h3>
 
 ## Requirement 1
 
-- [ ] User bisa melihat list movie pada web
-- [ ] Search Movie
-- [ ] Movie id
-- [ ] Movie Title
-- [ ] Image Movie
-- [ ] Popularity
-- [ ] Overview
+- [x] User bisa melihat list movie pada web
+- [x] Search Movie
+- [x] Movie id
+- [x] Movie Title
+- [x] Image Movie
+- [x] Popularity
+- [x] Overview
 
 ## Requirement 2 
 
-- [x] User dapat login ke web menggunakan session melalui API yang telah tersedia
-- [x] Web dapat menampilkan informasi user yang sedang login
-- [x] user dapat logout dengan menghapus session yang sedang berjalan
+- [ ] User dapat login ke web menggunakan session melalui API yang telah tersedia
+- [ ] Web dapat menampilkan informasi user yang sedang login
+- [ ] user dapat logout dengan menghapus session yang sedang berjalan
 
 ## Continued
