@@ -1,7 +1,8 @@
-import Second from '../Components/Second'
+import Detail from "../Components/Detail"
+
 
 const About = () => {
-    return <Second />
+    return <Detail />
 }
 
 export default About

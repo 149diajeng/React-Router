@@ -1,9 +1,14 @@
-import Contoh from "../Components/Contoh"
+import MovieList from "../Components/MovieList";
+import Rumah from "../Components/Rumah";
 
 const Home = () => {
-    return (
-        <Contoh />
-    )
+  return (
+    
+
+    <div className="App">
+        <MovieList />
+    </div>
+  ) 
 }
 
 export default Home;

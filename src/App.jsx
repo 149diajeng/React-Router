@@ -1,33 +1,28 @@
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import { useState } from 'react'
-// import './App.css'
+// import { useState } from 'react'
 import Home from './Pages/Home'
-import About from './Pages/About'
-import Navbar from './Components/Navbar'
+import About from './Pages/About';
+import Login from './Pages/Login';
+import MovieList from './Components/MovieList';
 
-// const App = () => {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route exact path='/' element={<Home/>} />
-//         <Route path='/about' element={<About/>} />
-//         <Route path='/navbar' element={<Navbar/>}/>
-//       </Routes>
-//     </Router>
-//   )
-// }
 
-function App() {
+function App(props) {
   return (
     <Router>
       <Routes>
-        <Route exact path='/' element={<Home/>} />
-        <Route path='/about' element={<About/>} />
-        <Route path='/navbar' element={<Navbar/>}/>
+        
+        {/* <Route path='/' element={<MovieList />}></Route> */}
+        <Route path='/' element={<Home />}></Route>
+        {/* <Route path='/about' element={<About />}></Route>
+        <Route path='/login' element={<Login />}></Route> */}
       </Routes>
     </Router>
+    
   );
 }
 
-export default App
+export default App;
+
+
+
 
