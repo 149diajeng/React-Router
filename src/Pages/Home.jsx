@@ -1,12 +1,14 @@
 import MovieList from "../Components/MovieList";
 import Rumah from "../Components/Rumah";
+import NavBar from "./Navbar";
 
 const Home = () => {
   return (
     
 
     <div className="App">
-        <MovieList />
+      <NavBar />
+      <MovieList />
     </div>
   ) 
 }
