@@ -1,5 +1,5 @@
 import MovieList from "../Components/MovieList";
-import Rumah from "../Components/Rumah";
+import LoginFrom from "./LoginFrom";
 import NavBar from "./Navbar";
 
 const Home = () => {
@@ -8,6 +8,7 @@ const Home = () => {
 
     <div className="App">
       <NavBar />
+      <LoginFrom />
       <MovieList />
     </div>
   ) 

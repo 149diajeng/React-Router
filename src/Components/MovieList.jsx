@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './MovieList.css'
 
+import axios from 'axios';
+
 const API_KEY = '5840c53eacbb598c92e40f6f55ac8b70';
 
 const MovieList = () => {
@@ -9,13 +11,25 @@ const MovieList = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [query, setQuery] = useState('');
 
-  const fetchMovies = async (url) => {
+  const fetchMovies = async (url, headers={}) => {
     try {
-      const response = await fetch(url);
-      const data = await response.json();
-      setMovies(data.results);
-      setPage(1);
-      setTotalPages(data.total_pages);
+      const response = await axios.request({
+        method: 'get',
+        url: url,
+        headers: { 
+          'Content-Type': 'application/json',
+          ...headers
+        }, 
+      });
+      // console.log(response);
+      setMovies(response.data.results);
+      setPage(response.data.page);
+      setTotalPages(response.data.total_pages);
+      // const response = await fetch(url);
+      // const data = await response.json();
+      // setMovies(data.results);
+      // setPage(1);
+      // setTotalPages(data.total_pages);
     } catch (error) {
       console.error(error);
     }

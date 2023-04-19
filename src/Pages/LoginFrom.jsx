@@ -1,44 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-// require('dotenv').config()
+import axios from "axios";
 
 function LoginForm() {
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [requestToken, setRequestToken] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Define your API credentials and endpoints here
-  const API_KEY = 'process.env.API_KEY';
-  const REQUEST_TOKEN_URL = `https://api.themoviedb.org/3/authentication/token/new?api_key=${API_KEY}`;
-  const LOGIN_URL = `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${API_KEY}`;
-  const LOGOUT_URL = `https://api.themoviedb.org/3/authentication/session?api_key=${API_KEY}`;
+  const API_KEY = "5840c53eacbb598c92e40f6f55ac8b70";
+  const REQUEST_TOKEN_URL = `https://api.themoviedb.org/3/authentication/token/new`;
+  const LOGIN_URL = `https://api.themoviedb.org/3/authentication/token/validate_with_login`;
+  const SESSION_URL = `https://api.themoviedb.org/3/authentication/session/new`;
+  const ACCOUNT_URL = `https://api.themoviedb.org/3/account`;
 
-  const getRequestToken = () => {
-    return fetch(REQUEST_TOKEN_URL)
-      .then((response) => response.json())
-      .then((data) => {
-        localStorage.setItem("request_token", data.request_token);
+  // Retrieve session_id from localStorage, if it exists
+  const storedSessionId = localStorage.getItem("session_id");
+  const [sessionId, setSessionId] = useState(storedSessionId);
+
+  useEffect(() => {
+    axios
+      .get(REQUEST_TOKEN_URL, {
+        params: { api_key: API_KEY },
+      })
+      .then((response) => {
+        setRequestToken(response.data.request_token);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setError(error.response.data.status_message);
       });
-  };
+  }, []);
+
+  useEffect(() => {
+    // If session_id exists in localStorage, retrieve user details
+    if (sessionId) {
+      axios
+        .get(ACCOUNT_URL, {
+          params: {
+            session_id: sessionId,
+            api_key: API_KEY,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          setLoggedInUser(response.data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          setError(error.response.data.status_message);
+        });
+    }
+  }, [sessionId]);
 
   const handleLogout = () => {
-    fetch(LOGOUT_URL, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        session_id: localStorage.getItem("session_id"),
-      }),
-    })
+    axios
+      .delete(
+        `https://api.themoviedb.org/3/authentication/session?api_key=${API_KEY}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: {
+            session_id: localStorage.getItem("session_id"),
+          },
+        }
+      )
       .then(() => {
         localStorage.removeItem("session_id");
         setLoggedInUser(null);
+        setSessionId(null);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setError(error.response.data.status_message);
       });
   };
 
@@ -46,7 +81,8 @@ function LoginForm() {
     <div>
       {loggedInUser ? (
         <div>
-          Welcome, {loggedInUser}! <button onClick={handleLogout}>Logout</button>
+          <h2>Welcome, {loggedInUser.username}!</h2>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       ) : (
         <Formik
@@ -56,41 +92,56 @@ function LoginForm() {
             password: Yup.string().required("Required"),
           })}
           onSubmit={(values, { setSubmitting }) => {
-            fetch(LOGIN_URL, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                username: values.username,
-                password: values.password,
-                request_token: localStorage.getItem("request_token"),
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data);
-                return fetch(
-                  `https://api.themoviedb.org/3/authentication/session/new?api_key=${API_KEY}`,
+            axios
+              .post(
+                LOGIN_URL,
+                {
+                  username: values.username,
+                  password: values.password,
+                  request_token: requestToken,
+                },
+                {
+                  params: { api_key: API_KEY },
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              )
+              .then((response) => {
+                console.log(response);
+                return axios.post(
+                  SESSION_URL,
                   {
-                    method: "POST",
+                    request_token: response.data.request_token,
+                  },
+                  {
+                    params: { api_key: API_KEY },
                     headers: {
                       "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({
-                      request_token: data.request_token,
-                    }),
                   }
                 );
               })
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data);
-                setLoggedInUser(values.username);
-                localStorage.setItem("session_id", data.session_id);
+              .then((response) => {
+                console.log(response);
+                const sessionId = response.data.session_id;
+                localStorage.setItem("session_id", sessionId);
+                setSessionId(sessionId);
+                return axios.get(ACCOUNT_URL, {
+                  params: {
+                    session_id: sessionId,
+                    api_key: API_KEY,
+                  },
+                });
+              })
+              .then((response) => {
+                console.log(response);
+                setLoggedInUser(response.data);
+                setError(null);
               })
               .catch((error) => {
                 console.error("Error:", error);
+                setError(error.response.data.status_message);
               })
               .finally(() => {
                 setSubmitting(false);
@@ -111,6 +162,8 @@ function LoginForm() {
                 <ErrorMessage name="password" />
               </div>
 
+              {error && <div style={{ color: "red" }}>{error}</div>}
+
               <button type="submit" disabled={formik.isSubmitting}>
                 Submit
               </button>
@@ -118,86 +171,8 @@ function LoginForm() {
           )}
         </Formik>
       )}
-
-      {localStorage.getItem("request_token") === null && getRequestToken()}
     </div>
   );
 }
 
 export default LoginForm;
-
-
-
-// import { Formik, Form, Field, ErrorMessage } from "formik";
-// import * as Yup from "yup";
-
-// function LoginForm() {
-//     // FECTH
-//     // ENDPOINT DG API KEY DAN USER CREDENTIALS
-//   async function authenticateUser(username, password) {
-//     const url =
-//       "https://api.themoviedb.org/3/authentication/token/new?api_key=5840c53eacbb598c92e40f6f55ac8b70";
-//     const response = await fetch(url);
-//     const data = await response.json();
-//     const token = data.request_token;
-
-//     const loginUrl =
-//       "https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=5840c53eacbb598c92e40f6f55ac8b70";
-//     const loginResponse = await fetch(loginUrl, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ username, password, request_token: token }),
-//     });
-//     const loginData = await loginResponse.json();
-//     const sessionIdUrl =
-//       "https://api.themoviedb.org/3/authentication/session/new?api_key=5840c53eacbb598c92e40f6f55ac8b70";
-//     const sessionResponse = await fetch(sessionIdUrl, {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ request_token: loginData.request_token }),
-//     });
-//     const sessionData = await sessionResponse.json();
-//     return sessionData.session_id;
-//   }
-
-// //   MEMANGGIL AUTHENTICATEUSER
-//   return (
-//     <div>
-//       <Formik
-//         initialValues={{ username: "", password: "" }}
-//         validationSchema={Yup.object({
-//           username: Yup.string().required("Username is required"),
-//           password: Yup.string().required("Password is required"),
-//         })}
-//         onSubmit={(values, { setSubmitting }) => {
-//           authenticateUser(values.username, values.password)
-//             .then((sessionId) => console.log(sessionId))
-//             .catch((error) => console.log(error));
-//           setSubmitting(false);
-//         }}
-//       >
-//         {({ isSubmitting }) => (
-//           <Form>
-//             <div>
-//               <label htmlFor="username">Username</label>
-//               <Field name="username" type="text" />
-//               <ErrorMessage name="username" />
-//             </div>
-
-//             <div>
-//               <label htmlFor="password">Password</label>
-//               <Field name="password" type="password" />
-//               <ErrorMessage name="password" />
-//             </div>
-
-//             <button type="submit" disabled={isSubmitting}>
-//               Submit
-//             </button>
-//           </Form>
-//         )}
-//       </Formik>
-//     </div>
-//   );
-// }
-
-// export default LoginForm;
