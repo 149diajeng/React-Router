@@ -14,8 +14,8 @@
 
 ## Requirement 2 
 
-- [ ] User dapat login ke web menggunakan session melalui API yang telah tersedia
-- [ ] Web dapat menampilkan informasi user yang sedang login
-- [ ] user dapat logout dengan menghapus session yang sedang berjalan
+- [x] User dapat login ke web menggunakan session melalui API yang telah tersedia
+- [x] Web dapat menampilkan informasi user yang sedang login
+- [x] user dapat logout dengan menghapus session yang sedang berjalan
 
 ## Continued
