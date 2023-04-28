@@ -25,11 +25,6 @@ const MovieList = () => {
       setMovies(response.data.results);
       setPage(response.data.page);
       setTotalPages(response.data.total_pages);
-      // const response = await fetch(url);
-      // const data = await response.json();
-      // setMovies(data.results);
-      // setPage(1);
-      // setTotalPages(data.total_pages);
     } catch (error) {
       console.error(error);
     }
@@ -84,9 +79,9 @@ const MovieList = () => {
               </div>
               <div className='movie-detail'>
                 <h2>{movie.title}</h2>
-                {/* <p>ID: {movie.id}</p> */}
+                <p>ID: {movie.id}</p>
                 <p>Popularity: {movie.popularity}</p>
-                {/* <p>{movie.overview}</p> */}
+                <p>{movie.overview}</p>
               </div>
             </li>
           ))}

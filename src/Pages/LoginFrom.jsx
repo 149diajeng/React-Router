@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import './LoginFrom.css'
+import styled from 'styled-components';
+
 
 function LoginForm() {
   const [loggedInUser, setLoggedInUser] = useState(null);
@@ -81,7 +84,7 @@ function LoginForm() {
     <div>
       {loggedInUser ? (
         <div>
-          <h2>Welcome, {loggedInUser.username}!</h2>
+          <h3>Welcome, {loggedInUser.username}!</h3>
           <button onClick={handleLogout}>Logout</button>
         </div>
       ) : (
@@ -127,17 +130,6 @@ function LoginForm() {
                 const sessionId = response.data.session_id;
                 localStorage.setItem("session_id", sessionId);
                 setSessionId(sessionId);
-                return axios.get(ACCOUNT_URL, {
-                  params: {
-                    session_id: sessionId,
-                    api_key: API_KEY,
-                  },
-                });
-              })
-              .then((response) => {
-                console.log(response);
-                setLoggedInUser(response.data);
-                setError(null);
               })
               .catch((error) => {
                 console.error("Error:", error);
@@ -151,14 +143,14 @@ function LoginForm() {
           {(formik) => (
             <Form>
               <div>
-                <label htmlFor="username">Username:</label>
-                <Field type="text" name="username" />
+                <label htmlFor="username"></label>
+                <Field type="text" name="username" placeholder="Username" />
                 <ErrorMessage name="username" />
               </div>
 
               <div>
-                <label htmlFor="password">Password:</label>
-                <Field type="password" name="password" />
+                <label htmlFor="password"></label>
+                <Field type="password" name="password" placeholder="Password" />
                 <ErrorMessage name="password" />
               </div>
 
